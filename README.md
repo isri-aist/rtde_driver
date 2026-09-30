@@ -12,12 +12,15 @@ The [`Dockerfile`](Dockerfile) builds an image that runs `uri interface` with
 this driver. It starts from the `unified_robot_interface` image (ROS Jazzy,
 mc_rtc, zenoh and URI already installed in `/opt/uri`), so only this driver and`ur_client_library` are added.
 
-[`compose.yaml`](compose.yaml) builds the image and runs it with the options
-it needs, reading configs from `./etc` (mounted on `/config`):
+[`compose.yaml`](compose.yaml) runs the published image
+(`ghcr.io/isri-aist/rtde_driver:latest`) with the options it needs, reading
+configs from `./etc` (mounted on `/config`):
 
 ```bash
-docker compose up --build                               # etc/robot_interface.yaml
+docker compose up                                       # etc/robot_interface.yaml
 URI_CONFIG_FILE=ursim_ur5e.yaml docker compose up       # URSim
+docker compose pull                                     # update to the latest main
+docker compose up --build                               # build locally instead
 ```
 
 It sets:
@@ -36,7 +39,8 @@ Environment variables, read from the shell or a `.env` file next to
 |---|---|---|
 | `URI_CONFIG_DIR` | `./etc` | Host directory mounted on `/config` |
 | `URI_CONFIG_FILE` | `robot_interface.yaml` | File in it passed to `uri interface -c` |
-| `BASE_IMAGE` | `ghcr.io/isri-aist/unified_robot_interface:latest` | URI image to build on |
+| `RTDE_DRIVER_IMAGE` | `ghcr.io/isri-aist/rtde_driver:latest` | Image to run (e.g. pin a `:<commit sha>` tag) |
+| `BASE_IMAGE` | `ghcr.io/isri-aist/unified_robot_interface:latest` | URI image to build on (with `--build`) |
 
 The base image is published by the URI repository's CI. To build it locally
 instead, from the URI repository:

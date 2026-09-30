@@ -1,6 +1,8 @@
 # Runs `uri interface` with the RobotDriverRTDE plugin (see Dockerfile).
 #
-#   docker compose up --build
+#   docker compose up            # pulls the image published by CI
+#   docker compose pull          # updates it to the latest main
+#   docker compose up --build    # builds it locally instead
 #
 # Configs are read from ./etc (mounted on /config). Override with
 # URI_CONFIG_DIR=/some/dir and URI_CONFIG_FILE=<file in it>, e.g.
@@ -11,7 +13,7 @@ services:
       context: .
       args:
         BASE_IMAGE: ${BASE_IMAGE:-ghcr.io/isri-aist/unified_robot_interface:latest}
-    image: rtde_driver:latest
+    image: ${RTDE_DRIVER_IMAGE:-ghcr.io/isri-aist/rtde_driver:latest}
     # zenoh reaches the manager, and the driver reaches the UR controller (or
     # URSim's docker network), over the host network. The UR controller also
     # connects back to this host for the external-control script.
