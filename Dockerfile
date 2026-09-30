@@ -1,0 +1,38 @@
+# Runs `uri interface` with the RobotDriverRTDE plugin (Universal Robots).
+#
+# Built on the unified_robot_interface image (ROS Jazzy, mc_rtc, zenoh and
+# URI already installed in ${URI_PREFIX}=/opt/uri), so only this driver is
+# built here. It is installed in the same prefix, where `uri interface` looks
+# for driver plugins.
+ARG BASE_IMAGE=ghcr.io/isri-aist/unified_robot_interface:latest
+FROM ${BASE_IMAGE}
+
+USER root
+
+# ur_client_library, from ROS's apt repository.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+      ros-${ROS_DISTRO}-ur-client-library \
+      libfmt-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . /tmp/rtde_driver
+RUN . /opt/ros/${ROS_DISTRO}/setup.sh \
+    && cmake -S /tmp/rtde_driver -B /tmp/rtde_driver/build \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_PREFIX_PATH="${URI_PREFIX};${EXTRA_DEPS_PREFIX};/opt/ros/${ROS_DISTRO}" \
+        -DCMAKE_INSTALL_PREFIX=${URI_PREFIX} \
+    && cmake --build /tmp/rtde_driver/build --parallel $(nproc) \
+    && cmake --install /tmp/rtde_driver/build \
+    && mkdir -p /config ${URI_PREFIX}/share \
+    && cp -r /tmp/rtde_driver/etc ${URI_PREFIX}/share/rtde_driver \
+    && rm -rf /tmp/rtde_driver \
+    && test -f ${URI_PREFIX}/lib/robot_interface/libRobotDriverRTDE.so
+
+USER vscode
+WORKDIR /config
+
+# Mount a directory holding robot_interface.yaml on /config.
+# Example configs are in /opt/uri/share/rtde_driver.
+# The base image's entrypoint sources /opt/ros/${ROS_DISTRO}/setup.bash.
+CMD ["uri", "interface", "-c", "/config/robot_interface.yaml"]
