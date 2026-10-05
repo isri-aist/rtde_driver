@@ -3,7 +3,7 @@
 A `robot_interface` driver plugin for Universal Robots controllers via the
 [Universal Robots Client Library](https://github.com/UniversalRobots/Universal_Robots_Client_Library).
 
-It implements the `mc_robot_interface::RobotDriver` interface so it can be loaded
+It implements the `robot_interface::RobotDriver` interface so it can be loaded
 by `robot_interface` at runtime as a shared library — no mc_rtc dependency required.
 
 ## Docker
@@ -167,13 +167,13 @@ loop:
 The shared library exports three C symbols consumed by `robot_interface`'s plugin loader:
 
 ```cpp
-void MC_RTC_ROBOT_DRIVER(std::vector<std::string> & classes);  // registers "RobotDriverRTDE"
-mc_robot_interface::RobotDriver * create(const std::string & name,
+void ROBOT_DRIVER_PLUGIN(std::vector<std::string> & classes);  // registers "RobotDriverRTDE"
+robot_interface::RobotDriver * create(const std::string & name,
                                          const std::string & ip,
                                          const uint16_t & port,
                                          const std::string & config_path,
-                                         const std::vector<mc_robot_interface::GripperInfo> & grippers);
-void destroy(mc_robot_interface::RobotDriver * ptr);
+                                         const std::vector<robot_interface::GripperInfo> & grippers);
+void destroy(robot_interface::RobotDriver * ptr);
 ```
 
 Configure it in `robot_manager/etc/mc_rtc_rtde.yaml` under the `robot_interface` key of the
