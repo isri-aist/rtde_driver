@@ -145,25 +145,25 @@ bool RobotDriverRTDE::freeDrive(bool enable)
 
 // Lets robot_interface refuse this plugin (instead of crashing) once the
 // RobotDriver interface changes and the plugin needs a rebuild.
-MC_ROBOT_DRIVER_EXPORT_ABI_VERSION()
+ROBOT_DRIVER_EXPORT_ABI_VERSION()
 
 extern "C"
 {
-  void MC_RTC_ROBOT_DRIVER(std::vector<std::string> & classes)
+  void ROBOT_DRIVER_PLUGIN(std::vector<std::string> & classes)
   {
     classes.push_back("RobotDriverRTDE");
   }
 
-  mc_robot_interface::RobotDriver * create(const std::string & /*name*/,
-                                           const std::string & ip,
-                                           const uint16_t & port,
-                                           const std::string & config_path,
-                                           const std::vector<mc_robot_interface::GripperInfo> & /*grippers*/)
+  robot_interface::RobotDriver * create(const std::string & /*name*/,
+                                        const std::string & ip,
+                                        const uint16_t & port,
+                                        const std::string & config_path,
+                                        const std::vector<robot_interface::GripperInfo> & /*grippers*/)
   {
     return new rtde_driver::RobotDriverRTDE(ip, port, config_path);
   }
 
-  void destroy(mc_robot_interface::RobotDriver * ptr)
+  void destroy(robot_interface::RobotDriver * ptr)
   {
     delete ptr;
   }
