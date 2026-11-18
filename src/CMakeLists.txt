@@ -9,6 +9,15 @@ target_link_libraries(RobotDriverRTDE
                       PUBLIC unified_robot_interface::robot_driver_api)
 target_link_libraries(RobotDriverRTDE PRIVATE ur_client_library::urcl fmt::fmt)
 
+# external_control.urscript is installed by ur_client_library under
+# <prefix>/share/ur_client_library/resources; derive <prefix> from its config.
+cmake_path(SET URCL_PREFIX NORMALIZE "${ur_client_library_DIR}/../../..")
+target_compile_definitions(
+  RobotDriverRTDE
+  PRIVATE
+    URCL_SCRIPT_FILE="${URCL_PREFIX}/share/ur_client_library/resources/external_control.urscript"
+)
+
 add_robot_driver(RobotDriverRTDE)
 
 install(
