@@ -17,6 +17,9 @@ std::string findUrScript()
   if(const char * env = std::getenv("UR_SCRIPT_FILE")) return env;
 
   const char * candidates[] = {
+#ifdef URCL_SCRIPT_FILE
+      URCL_SCRIPT_FILE,
+#endif
       "/opt/ros/humble/share/ur_client_library/resources/external_control.urscript",
       "/opt/ros/iron/share/ur_client_library/resources/external_control.urscript",
       "/opt/ros/jazzy/share/ur_client_library/resources/external_control.urscript",
